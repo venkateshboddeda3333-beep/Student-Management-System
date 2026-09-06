@@ -2,6 +2,9 @@ package com.example.studentmanagement.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.studentmanagement.model.Student;
@@ -10,68 +13,84 @@ import com.example.studentmanagement.repository.StudentRepository;
 @Service
 public class StudentService {
 
-    private final StudentRepository repository;
-
-    public StudentService(StudentRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private StudentRepository studentRepository;
 
     // CREATE
     public Student createStudent(Student student) {
-        return repository.save(student);
+        return studentRepository.save(student);
     }
 
-    // GET ALL STUDENTS
-    public List<Student> getStudents() {
-        return repository.findAll();
+    // GET ALL
+    public List<Student> getAllStudents() {
+        return studentRepository.findAll();
     }
 
-    // GET STUDENT BY ID
-    public Student getStudent(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                    new RuntimeException("Student not found with id: " + id));
+    // GET BY ID
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).orElse(null);
     }
 
-    // PUT - COMPLETE UPDATE
-    public Student updateStudent(Long id, Student updatedStudent) {
+    // UPDATE
+    public Student updateStudent(Long id, Student student) {
 
-        Student student = getStudent(id);
+        Student existingStudent = studentRepository.findById(id).orElse(null);
 
-        student.setName(updatedStudent.getName());
-        student.setEmail(updatedStudent.getEmail());
-        student.setAge(updatedStudent.getAge());
-        student.setCourse(updatedStudent.getCourse());
+        if (existingStudent != null) {
 
-        return repository.save(student);
-    }
+            existingStudent.setName(student.getName());
+            existingStudent.setEmail(student.getEmail());
+            existingStudent.setAge(student.getAge());
+            existingStudent.setCourse(student.getCourse());
 
-    // PATCH - PARTIAL UPDATE
-    public Student updateStudentPartially(Long id, Student updatedStudent) {
-
-        Student student = getStudent(id);
-
-        if (updatedStudent.getName() != null) {
-            student.setName(updatedStudent.getName());
+            return studentRepository.save(existingStudent);
         }
 
-        if (updatedStudent.getEmail() != null) {
-            student.setEmail(updatedStudent.getEmail());
-        }
-
-        if (updatedStudent.getAge() != null) {
-            student.setAge(updatedStudent.getAge());
-        }
-
-        if (updatedStudent.getCourse() != null) {
-            student.setCourse(updatedStudent.getCourse());
-        }
-
-        return repository.save(student);
+        return null;
     }
 
     // DELETE
-    public void deleteStudent(Long id) {
-        repository.deleteById(id);
+    public boolean deleteStudent(Long id) {
+
+        if (studentRepository.existsById(id)) {
+            studentRepository.deleteById(id);
+            return true;
+        }
+
+        return false;
+    }
+
+    // PATCH
+    public Student patchStudent(Long id, Student student) {
+
+        Student existingStudent = studentRepository.findById(id).orElse(null);
+
+        if (existingStudent != null) {
+
+            if (student.getName() != null) {
+                existingStudent.setName(student.getName());
+            }
+
+            if (student.getEmail() != null) {
+                existingStudent.setEmail(student.getEmail());
+            }
+
+            if (student.getAge() != null) {
+                existingStudent.setAge(student.getAge());
+            }
+
+            if (student.getCourse() != null) {
+                existingStudent.setCourse(student.getCourse());
+            }
+
+            return studentRepository.save(existingStudent);
+        }
+
+        return null;
+    }
+
+    // PAGINATION + SORTING
+    public Page<Student> getStudentsWithPagination(Pageable pageable) {
+        return studentRepository.findAll(pageable);
     }
 }

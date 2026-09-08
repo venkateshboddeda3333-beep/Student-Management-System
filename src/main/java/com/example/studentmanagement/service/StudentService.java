@@ -13,8 +13,11 @@ import com.example.studentmanagement.repository.StudentRepository;
 @Service
 public class StudentService {
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
+
+    StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
 
     // CREATE
     public Student createStudent(Student student) {

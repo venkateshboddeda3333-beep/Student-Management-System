@@ -1,14 +1,9 @@
 package com.example.studentmanagement.model;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 
 @Entity
 public class Student {
@@ -24,10 +19,6 @@ public class Student {
     private Integer age;
 
     private String course;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "student_id")
-    private List<Passport> passports;
 
     // Default Constructor
     public Student() {
@@ -83,11 +74,4 @@ public class Student {
         this.course = course;
     }
 
-    public List<Passport> getPassports() {
-        return passports;
-    }
-
-    public void setPassports(List<Passport> passports) {
-        this.passports = passports;
-    }
-}
+}   

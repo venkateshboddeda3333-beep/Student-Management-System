@@ -1,7 +1,5 @@
 package com.example.studentmanagement.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,10 +21,10 @@ public class StudentService {
     public Student createStudent(Student student) {
         return studentRepository.save(student);
     }
-
-    // GET ALL
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    
+    // GET ALL WITH PAGINATION AND SORTING
+    public Page<Student> getAllStudentsWithPagination(Pageable pageable) {
+        return studentRepository.findAll(pageable);
     }
 
     // GET BY ID

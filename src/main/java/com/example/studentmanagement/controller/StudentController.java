@@ -45,8 +45,8 @@ public class StudentController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return studentService.getStudentsWithPagination(pageable);
-    }
+        return studentService.getAllStudentsWithPagination(pageable);
+    }   
 
     // GET BY ID
     @GetMapping("/{getid}")

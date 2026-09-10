@@ -17,8 +17,12 @@ public class StudentService {
         this.studentRepository = studentRepository;
     }
 
-    // CREATE
     public Student createStudent(Student student) {
+
+        if (studentRepository.existsByEmail(student.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         return studentRepository.save(student);
     }
     

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import com.example.studentmanagement.model.Student;
 import com.example.studentmanagement.service.StudentService;
@@ -20,8 +21,14 @@ public class StudentController {
 
     // CREATE
     @PostMapping
-    public Student createStudent(@RequestBody Student student) {
-        return studentService.createStudent(student);
+    public ResponseEntity<?> createStudent(@RequestBody Student student) {
+        try {
+            return ResponseEntity.ok(studentService.createStudent(student));
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(e.getMessage());
+        }
     }
 
     // GET ALL WITH PAGINATION AND SORTING

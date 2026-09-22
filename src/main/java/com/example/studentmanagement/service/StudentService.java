@@ -5,41 +5,66 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.studentmanagement.dto.StudentDto;
 import com.example.studentmanagement.model.Student;
 import com.example.studentmanagement.repository.StudentRepository;
+import com.example.studentmanagement.exception.StudentNotFoundException;
 
 @Service
 public class StudentService {
 
-    private final StudentRepository studentRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
-    StudentService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
-    }
 
-    public Student createStudent(Student student) {
+    // CREATE
+    public StudentDto createStudent(StudentDto studentDto) {
 
-        if (studentRepository.existsByEmail(student.getEmail())) {
+        if (studentRepository.existsByEmail(studentDto.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
 
-        return studentRepository.save(student);
+        Student student = new Student();
+
+        student.setName(studentDto.getName());
+        student.setEmail(studentDto.getEmail());
+        student.setAge(studentDto.getAge());
+        student.setCourse(studentDto.getCourse());
+
+        Student savedStudent = studentRepository.save(student);
+
+        StudentDto responseDto = new StudentDto();
+
+        responseDto.setName(savedStudent.getName());
+        responseDto.setEmail(savedStudent.getEmail());
+        responseDto.setAge(savedStudent.getAge());
+        responseDto.setCourse(savedStudent.getCourse());
+
+        return responseDto;
     }
-    
+
+
     // GET ALL WITH PAGINATION AND SORTING
-    public Page<Student> getAllStudentsWithPagination(Pageable pageable) {
+    public Page<Student> getStudentWithPagination(Pageable pageable) {
+
         return studentRepository.findAll(pageable);
     }
 
+
     // GET BY ID
     public Student getStudentById(Long id) {
-        return studentRepository.findById(id).orElse(null);
+
+        return studentRepository.findById(id)
+                .orElseThrow(() ->
+                    new StudentNotFoundException("Student not found")
+                );
     }
 
     // UPDATE
     public Student updateStudent(Long id, Student student) {
 
-        Student existingStudent = studentRepository.findById(id).orElse(null);
+        Student existingStudent =
+                studentRepository.findById(id).orElse(null);
 
         if (existingStudent != null) {
 
@@ -54,21 +79,26 @@ public class StudentService {
         return null;
     }
 
+
     // DELETE
     public boolean deleteStudent(Long id) {
 
         if (studentRepository.existsById(id)) {
+
             studentRepository.deleteById(id);
+
             return true;
         }
 
         return false;
     }
 
+
     // PATCH
     public Student patchStudent(Long id, Student student) {
 
-        Student existingStudent = studentRepository.findById(id).orElse(null);
+        Student existingStudent =
+                studentRepository.findById(id).orElse(null);
 
         if (existingStudent != null) {
 
@@ -92,10 +122,5 @@ public class StudentService {
         }
 
         return null;
-    }
-
-    // PAGINATION + SORTING
-    public Page<Student> getStudentsWithPagination(Pageable pageable) {
-        return studentRepository.findAll(pageable);
     }
 }
